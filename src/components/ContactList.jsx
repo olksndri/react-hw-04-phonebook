@@ -1,7 +1,7 @@
 import css from '../styles/app.module.css';
 import PropTypes from 'prop-types';
 
-export const ContactList = ({ contacts, filter, onDelete }) => { 
+export const ContactList = ({ onDelete, contacts, filter }) => { 
     return (
         <>
             <ul className={css['contacts-list']}>
@@ -9,16 +9,16 @@ export const ContactList = ({ contacts, filter, onDelete }) => {
                 contacts.map(el => {
                         return (
                             <li key={el.id} className={css['contacts-list-item']}>
-                            <span>{el.name}: {el.number}</span>
-                            <button type="button" onClick={onDelete} key={el.id}>Delete</button>
-                            </li>) 
-                }) : 
+                                <span>{el.name}: {el.number}</span>
+                                <button type="button" onClick={onDelete} key={el.id}>Delete</button>
+                            </li>
+                        )}) : 
                 contacts.map(el => {
                     if (el.name.toLowerCase().includes(filter.toLowerCase())) {
                         return (
                             <li key={el.id} className={css['contacts-list-item']}>
-                            <span>{el.name}: {el.number}</span>
-                            <button type="button" onClick={onDelete} key={el.id}>Delete</button>
+                                <span>{el.name}: {el.number}</span>
+                                <button type="button" onClick={onDelete} key={el.id}>Delete</button>
                             </li>)
                     } return <></>; 
                 })}
@@ -28,7 +28,7 @@ export const ContactList = ({ contacts, filter, onDelete }) => {
 }
 
 ContactList.propTypes = { 
+    onDelete: PropTypes.func.isRequired,
     contacts: PropTypes.array.isRequired,
-    filter: PropTypes.string,
-    onDelete: PropTypes.func.isRequired
+    filter: PropTypes.string
 }

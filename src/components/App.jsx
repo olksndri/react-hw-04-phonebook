@@ -4,94 +4,127 @@ import { ContactList } from './ContactList';
 import { Filter } from './Filter';
 import { nanoid } from 'nanoid';
 import { save, load } from 'js/storage';
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
+// import React, { Component } from 'react';
 
-export class App extends Component {
-  state = {
-    filter: '',
-  }
+// export class App extends Component {
+//   state = {
+//     filter: '',
+//   }
 
-  constructor(props) { 
-    super(props); 
+//   constructor(props) {
+//     super(props);
 
-    this.state.contacts = (typeof load("contacts") === "object" &&
-      load("contacts") !== null) ?
-      load("contacts") : [];
-  }
+//     this.state.contacts = (typeof load("contacts") === "object" &&
+//       load("contacts") !== null) ?
+//       load("contacts") : [];
+//   }
 
-  onSubmit = (evt) => {
-    evt.preventDefault(); 
-    if (this.state.contacts.filter(el => el.name === this.state.name).length > 0) { 
-        window.alert(`${this.state.name} is already in contacts`)
-    } else { 
-       this.setState((state) => {
-        save("contacts", [...state.contacts, { name: state.name, number: state.number, id: nanoid(), }]);
+//   onSubmit = (evt) => {
+//     evt.preventDefault();
+    // if (this.state.contacts.filter(el => el.name === this.state.name).length > 0) {
+    //     window.alert(`${this.state.name} is already in contacts`)
+    // } else {
+    //    this.setState((state) => {
+    //     save("contacts", [...state.contacts, { name: state.name, number: state.number, id: nanoid(), }]);
         
-        return {
-          contacts: [...state.contacts, { name: state.name, number: state.number, id: nanoid(), }],
-          name: '', 
-          number: '',
-          filter: ''
-        }
-        })
+    //     return {
+    //       contacts: [...state.contacts, { name: state.name, number: state.number, id: nanoid(), }],
+    //       name: '',
+    //       number: '',
+    //       filter: ''
+    //     }
+    //     })
+    // }
+//   }
+
+//   onInput = (evt) => {
+//     if (evt.target.getAttribute("name") === "name") {
+//       this.setState({ name: evt.target.value });
+//     } else if ((evt.target.getAttribute("name") === "number")) {
+//       this.setState({ number: evt.target.value });
+//     } else {
+//       this.setState({ filter: evt.target.value });
+//     }
+//   }
+  
+//   onDelete = (evt) => {
+    // let deleteIndex;
+    // this.state.contacts.forEach((el, i) => {
+    //   if (evt.target.previousElementSibling.textContent.includes(el.name)) {
+    //       deleteIndex = i;
+    //   }
+    // })
+    // this.setState((state) => {
+    //   let counter = state.contacts.filter((el, i) => i !== deleteIndex);
+    //   save("contacts", counter);
+    //   return { contacts: counter };
+    // })
+//   }
+
+//   render() {
+//     const { contacts, name, number, filter } = this.state;
+
+//   }
+// };
+
+export const App = () => { 
+  const [filter, setFilter] = useState(''); 
+  const [contacts, setContacts] = useState((load("contacts") !== null) ? load("contacts") : []); 
+  const [name, setName] = useState(''); 
+  const [number, setNumber] = useState(''); 
+
+  const onSubmit = (evt) => { 
+    evt.preventDefault()
+    if (contacts.filter(el => el.name === name).length > 0) {
+      window.alert(`${name} is already in contacts`); 
+    } else {
+      setContacts([...contacts, { name, number, id: nanoid() }]); 
+      save("contacts", [...contacts, { name, number, id: nanoid() }]);
+      setName('');
+      setNumber('');
+      setFilter(''); 
     }
   }
 
-  onInput = (evt) => { 
-    if (evt.target.getAttribute("name") === "name") {
-      this.setState({ name: evt.target.value }); 
-    } else if ((evt.target.getAttribute("name") === "number")) {
-      this.setState({ number: evt.target.value }); 
-    } else {
-      this.setState({ filter: evt.target.value }); 
-    }
-  }
-  
-  onDelete = (evt) => {
-    let deleteIndex; 
-    this.state.contacts.forEach((el, i) => { 
+  const onDelete = (evt) => { 
+    let deleteIndex;
+    contacts.forEach((el, i) => {
       if (evt.target.previousElementSibling.textContent.includes(el.name)) {
-          deleteIndex = i; 
+          deleteIndex = i;
       }
     })
-    this.setState((state) => { 
-      let counter = state.contacts.filter((el, i) => i !== deleteIndex); 
-      save("contacts", counter);
-      return { contacts: counter }; 
-    })
+    let updatedContacts = contacts.filter((el, i) => i !== deleteIndex);
+    save("contacts", updatedContacts);
+    setContacts(updatedContacts);
   }
 
-  render() {
-    const { contacts, name, number, filter } = this.state; 
-
-    return ( 
+  return (
       <>
         <h1 className={css.title}>Phonebook</h1>
         <ContactForm
-          onSubmit={this.onSubmit}
-          onInput={this.onInput}
+          onSubmit={onSubmit}
+          onInput={{name, setName, number, setNumber}}
           textId={nanoid()}
           numberId={nanoid()}
-          name={name}
-          number={number}
         >
         </ContactForm>
         <div className={css['contacts-wrapper']}>
-        <h2 className={css.title}>Contacts</h2>
-        <Filter
-          onInput={this.onInput}
-          filterId={nanoid()}
-          filter={filter}
-        >
-        </Filter>
-        <ContactList
-          onDelete={this.onDelete}
-          contacts={contacts}
-          filter={filter}
-        >
-        </ContactList>
+          <h2 className={css.title}>Contacts</h2>
+          <Filter
+            onInput={{filter, setFilter}}
+            filterId={nanoid()}
+          >
+          </Filter>
+          <ContactList
+            onDelete={onDelete}
+            contacts={contacts}
+            filter={filter}
+          >
+          </ContactList>
         </div>
-      </> 
-    )
-  }
-};
+      </>
+  )
+}
+
+ 
